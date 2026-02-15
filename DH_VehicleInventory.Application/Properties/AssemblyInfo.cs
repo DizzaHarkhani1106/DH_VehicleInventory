@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("DH_VehicleInventory.Domain")]
+[assembly: AssemblyTitle("DH_VehicleInventory.Application")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("DH_VehicleInventory.Domain")]
+[assembly: AssemblyProduct("DH_VehicleInventory.Application")]
 [assembly: AssemblyCopyright("Copyright ©  2026")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("12f94133-8e2c-4e74-b9bf-e1b743cb6ad9")]
+[assembly: Guid("14bd57c4-d632-431e-8660-2194bba4e493")]
 
 // Version information for an assembly consists of the following four values:
 //

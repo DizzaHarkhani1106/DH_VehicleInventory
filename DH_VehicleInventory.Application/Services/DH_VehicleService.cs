@@ -60,6 +60,54 @@ namespace DH_VehicleInventory.Application.Services
             return vehicles.Select(v => MapToDto(v));
         }
 
+        // Update Vehicle Status
+        public async Task<DH_VehicleDto> UpdateVehicleStatusAsync(int id, DH_UpdateVehicleStatusDto dto)
+        {
+            if (!Enum.IsDefined(typeof(VehicleStatus), dto.Status))
+                throw new ArgumentException("Invalid vehicle status.");
+
+            var vehicle = await _repository.GetByIdAsync(id);
+
+            if (vehicle == null)
+                throw new KeyNotFoundException("Vehicle not found.");
+
+            var newStatus = (VehicleStatus)dto.Status;
+
+            // Call domain behavior methods instead of changing status directly
+            switch (newStatus)
+            {
+                case VehicleStatus.Available:
+                    vehicle.MarkAvailable();
+                    break;
+                case VehicleStatus.Reserved:
+                    vehicle.MarkReserved();
+                    break;
+                case VehicleStatus.Rented:
+                    vehicle.MarkRented();
+                    break;
+                case VehicleStatus.Maintenance:
+                    vehicle.MarkServiced();
+                    break;
+                default:
+                    throw new ArgumentException("Unsupported status transition.");
+            }
+
+            await _repository.UpdateAsync(vehicle);
+
+            return MapToDto(vehicle);
+        }
+
+        // Delete Vehicle
+        public async Task DeleteVehicleAsync(int id)
+        {
+            var vehicle = await _repository.GetByIdAsync(id);
+
+            if (vehicle == null)
+                throw new KeyNotFoundException("Vehicle not found.");
+
+            await _repository.DeleteAsync(id);
+        }
+
         // Map Vehicle entity to DTO
         private DH_VehicleDto MapToDto(Vehicle vehicle)
         {

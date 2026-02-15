@@ -48,6 +48,7 @@
     <Compile Include="Interfaces\DH_IVehicleRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\DH_VehicleService.cs" />
+    <Compile Include="Validators\DH_CreateVehicleValidator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DH_VehicleInventory.Domain\DH_VehicleInventory.Domain.csproj">

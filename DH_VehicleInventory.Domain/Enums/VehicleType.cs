@@ -2,9 +2,10 @@
 {
     public enum VehicleType
     {
+
         Sedan = 1,
         SUV = 2,
-        Truck = 3,
+        Truck = 10,
         Van = 4
     }
 }

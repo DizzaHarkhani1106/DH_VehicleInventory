@@ -8,7 +8,7 @@ namespace DH_VehicleInventory.Infrastructure.Data
         {
         }
 
-        public DbSet<Vehicle> Vehicles { get; set; }
+        public DbSet<Vehicle> DH_Vehicles { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

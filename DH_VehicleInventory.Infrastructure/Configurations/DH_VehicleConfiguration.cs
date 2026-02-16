@@ -31,10 +31,10 @@ namespace DH_VehicleInventory.Infrastructure.Configurations
                 .HasConversion<int>();
 
             builder.HasIndex(v => v.VehicleCode)
-                .HasDatabaseName("IX_DH_Vehicles_VehicleCode");
+                .HasDatabaseName("IDX_DH_Vehicles_VehicleCode");
 
             builder.HasIndex(v => v.Status)
-                .HasDatabaseName("IX_DH_Vehicles_Status");
+                .HasDatabaseName("IDX_DH_Vehicles_Status");
         }
     }
 }

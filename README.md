@@ -63,5 +63,103 @@ Controllers contain no business logic. They only receive requests, call the serv
 
 ---
 
+## Domain Model and Business Rules
+
+### Vehicle Entity Properties
+
+| Property | Type | Description |
+|---|---|---|
+| Id | int | Auto-generated primary key |
+| VehicleCode | string | Unique vehicle identifier, max 50 characters |
+| LocationId | int | Location reference, must be a positive number |
+| VehicleType | VehicleType | Sedan (1), SUV (2), Truck (10), Van (4) |
+| Status | VehicleStatus | Available (1), Reserved (2), Rented (3), Maintenance (4) |
+
+### Allowed Status Transitions
+
+| From | To | Method Used |
+|---|---|---|
+| Available | Reserved | MarkReserved() |
+| Available | Rented | MarkRented() |
+| Available | Maintenance | MarkServiced() |
+| Reserved | Available | ReleaseReservation() |
+| Rented | Available | MarkAvailable() |
+| Maintenance | Available | MarkAvailable() |
+
+### Blocked Status Transitions (throws DomainException)
+
+| From | To | Error Message |
+|---|---|---|
+| Reserved | Rented | Vehicle is currently reserved and cannot be rented. |
+| Reserved | Maintenance | Vehicle is currently reserved and cannot be sent for service. |
+| Rented | Reserved | Vehicle is currently rented and cannot be reserved. |
+| Rented | Maintenance | Vehicle is currently rented and cannot be sent for service. |
+| Maintenance | Reserved | Vehicle is under service and cannot be reserved. |
+| Maintenance | Rented | Vehicle is under service and cannot be rented. |
+
+### Business Invariants
+
+- Vehicle code cannot be null, empty, or whitespace
+- Location ID must be a positive number (greater than 0)
+- Every new vehicle is created with Status = Available
+- A reserved vehicle can ONLY return to Available through ReleaseReservation()
+- All properties use private setters — the entity fully controls its own state
+
+---
+
+## API Endpoints
+
+| Method | Endpoint | Description | Success Code | Error Codes |
+|---|---|---|---|---|
+| GET | /api/DH_Vehicles | Get all vehicles | 200 OK | — |
+| GET | /api/DH_Vehicles/{id} | Get vehicle by ID | 200 OK | 404 Not Found |
+| POST | /api/DH_Vehicles | Create a new vehicle | 201 Created | 400 Bad Request |
+| PUT | /api/DH_Vehicles/{id}/status | Update vehicle status | 200 OK | 400, 404 |
+| DELETE | /api/DH_Vehicles/{id} | Delete a vehicle | 204 No Content | 404 Not Found |
+
+---
+
+## Run Instructions
+
+### Prerequisites
+
+- .NET 8.0 SDK
+- SQL Server LocalDB (included with Visual Studio 2022)
+- Visual Studio 2022
+
+### Steps to Run
+
+1. Clone the repository
+2. Open DH_VehicleInventory.sln in Visual Studio 2022
+3. Open Package Manager Console (Tools > NuGet Package Manager > Package Manager Console)
+4. Set Default Project dropdown to DH_VehicleInventory.Infrastructure
+5. Run: Update-Database
+6. Right-click DH_VehicleInventory.WebAPI and click Set as Startup Project
+7. Press F5 to run
+8. Swagger UI opens at https://localhost:7197/swagger/index.html
+
+---
+
+## Known Limitations
+
+- No authentication or authorization — all endpoints are publicly accessible
+- No pagination on the GET all endpoint
+- LocationId is a simple integer with no Location entity mapped in EF Core
+- VehicleType and VehicleStatus are stored as integer enums, not normalized lookup tables
+- No global exception handling middleware
+- No unit tests or integration tests included
+- No structured logging implemented
+- The EF Core model uses a single DH_Vehicles table, which differs from the normalized Assignment 1 SQL schema
+
+---
+
+## Technologies Used
+
+- ASP.NET Core 8.0
+- Entity Framework Core 8.0
+- SQL Server LocalDB
+- Swagger / Swashbuckle
+- Clean Architecture
+- Domain-Driven Design (DDD)
 
 

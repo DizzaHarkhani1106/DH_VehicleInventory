@@ -5,7 +5,7 @@
 
         Sedan = 1,
         SUV = 2,
-        Truck = 10,
+        Truck = 3,
         Van = 4
     }
 }

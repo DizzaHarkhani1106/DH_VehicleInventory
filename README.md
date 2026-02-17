@@ -60,3 +60,8 @@ The presentation layer — the entry point for HTTP requests. It contains:
 - **appsettings.json** — Contains the database connection string.
 
 Controllers contain no business logic. They only receive requests, call the service, and return HTTP responses.
+
+---
+
+
+

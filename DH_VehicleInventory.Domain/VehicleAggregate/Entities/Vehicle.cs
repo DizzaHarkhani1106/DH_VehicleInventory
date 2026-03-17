@@ -2,6 +2,8 @@
 using DH_VehicleInventory.Domain.VehicleAggregate.ValueObjects;
 using DH_VehicleInventory.Domain.VehicleAggregate.Events;
 using DH_VehicleInventory.Domain.Exceptions;
+using System;
+using System.Collections.Generic;
 
 namespace DH_VehicleInventory.Domain.VehicleAggregate.Entities
 {
@@ -99,6 +101,7 @@ namespace DH_VehicleInventory.Domain.VehicleAggregate.Entities
             Status = VehicleStatus.Available;
             this.AddDomainEvent(new VehicleStatusChangedDomainEvent(Id, Status));
         }
+
         public void AddInventory(Inventory inventory)
         {
             if (inventory == null)

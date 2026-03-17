@@ -1,4 +1,4 @@
-﻿using DH_VehicleInventory.Domain.Entities;
+﻿using DH_VehicleInventory.Domain.VehicleAggregate.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

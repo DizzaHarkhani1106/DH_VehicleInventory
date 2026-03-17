@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using DH_VehicleInventory.Domain.Entities;
+using DH_VehicleInventory.Domain.VehicleAggregate.Entities;
 namespace DH_VehicleInventory.Infrastructure.Data
 {
     public class DH_InventoryDbContext: DbContext
@@ -9,6 +9,7 @@ namespace DH_VehicleInventory.Infrastructure.Data
 
         }
         public DbSet<Vehicle> DH_Vehicles { get; set; }
+        public DbSet<Inventory> DH_Inventories { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

@@ -1,24 +1,24 @@
+using DH_VehicleInventory.Infrastructure.Data;
+using DH_VehicleInventory.Domain.VehicleAggregate;
+using DH_VehicleInventory.Infrastructure.Repositories;
 using DH_VehicleInventory.Application.Interfaces;
 using DH_VehicleInventory.Application.Services;
 using DH_VehicleInventory.Application.Validators;
-using DH_VehicleInventory.Infrastructure.Data;
-using DH_VehicleInventory.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Register DbContext with SQL Server
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<DH_InventoryDbContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(connectionString)
+);
 
-// Register Application layer services
-builder.Services.AddScoped<DH_IVehicleRepository, DH_VehicleRepository>();
+builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
+
 builder.Services.AddScoped<DH_VehicleService>();
 builder.Services.AddScoped<DH_CreateVehicleValidator>();
 
-// Add services to the container.
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -32,7 +32,6 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -43,9 +42,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

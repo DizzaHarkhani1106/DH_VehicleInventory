@@ -1,8 +1,8 @@
 ﻿using DH_VehicleInventory.Application.DTOs;
 using DH_VehicleInventory.Application.Services;
 using DH_VehicleInventory.Application.Validators;
-using DH_VehicleInventory.Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace DH_VehicleInventory.WebAPI.Controllers
 {
@@ -13,54 +13,69 @@ namespace DH_VehicleInventory.WebAPI.Controllers
         private readonly DH_VehicleService _vehicleService;
         private readonly DH_CreateVehicleValidator _validator;
 
-        public DH_VehiclesController(DH_VehicleService vehicleService, DH_CreateVehicleValidator validator)
+        public DH_VehiclesController(
+            DH_VehicleService vehicleService,
+            DH_CreateVehicleValidator validator)
         {
-            _vehicleService = vehicleService;
-            _validator = validator;
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
-        {
-            var vehicles = await _vehicleService.GetAllVehiclesAsync();
-            return Ok(vehicles);
-        }
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
-        {
-            try
-            {
-                var vehicle = await _vehicleService.GetVehicleByIdAsync(id);
-                return Ok(vehicle);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { error = ex.Message });
-            }
+            _vehicleService = vehicleService ?? throw new ArgumentNullException(nameof(vehicleService));
+            _validator = validator ?? throw new ArgumentNullException(nameof(validator));
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] DH_CreateVehicleDto dto)
+        public IActionResult CreateVehicle([FromBody] DH_CreateVehicleDto dto)
         {
-            var validationErrors = _validator.Validate(dto);
-            if (validationErrors.Any())
-            {
-                return BadRequest(new { errors = validationErrors });
-            }
+            var validationResult = _validator.Validate(dto);
+            if (!validationResult.IsValid)
+                return BadRequest(new { errors = validationResult.Errors });
 
             try
             {
-                var vehicle = await _vehicleService.CreateVehicleAsync(dto);
-                return CreatedAtAction(nameof(GetById), new { id = vehicle.Id }, vehicle);
+                var vehicleDto = _vehicleService.CreateVehicle(dto);
+                return CreatedAtAction(nameof(GetVehicle), new { id = vehicleDto.Id }, vehicleDto);
             }
             catch (ArgumentException ex)
             {
                 return BadRequest(new { error = ex.Message });
             }
-            catch (DomainException ex)
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "An error occurred while creating the vehicle", details = ex.Message });
+            }
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetVehicle(int id)
+        {
+            try
+            {
+                var vehicle = await _vehicleService.GetVehicleAsync(id);
+
+                if (vehicle == null)
+                    return NotFound(new { error = $"Vehicle with ID {id} not found" });
+
+                return Ok(vehicle);
+            }
+            catch (ArgumentException ex)
             {
                 return BadRequest(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "An error occurred while retrieving the vehicle", details = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllVehicles()
+        {
+            try
+            {
+                var vehicles = await _vehicleService.GetAllVehiclesAsync();
+                return Ok(vehicles);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "An error occurred while retrieving vehicles", details = ex.Message });
             }
         }
 
@@ -69,34 +84,48 @@ namespace DH_VehicleInventory.WebAPI.Controllers
         {
             try
             {
-                var vehicle = await _vehicleService.UpdateVehicleStatusAsync(id, dto);
-                return Ok(vehicle);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { error = ex.Message });
+                if (dto == null)
+                    return BadRequest(new { error = "Status update DTO is required" });
+
+                if (dto.StatusId < 1 || dto.StatusId > 4)
+                    return BadRequest(new { error = "StatusId must be between 1 and 4" });
+
+                var result = await _vehicleService.UpdateVehicleStatus(id, dto);
+
+                if (!result)
+                    return NotFound(new { error = $"Vehicle with ID {id} not found" });
+
+                return Ok(new { success = true, message = "Vehicle status updated successfully" });
             }
             catch (ArgumentException ex)
             {
                 return BadRequest(new { error = ex.Message });
             }
-            catch (DomainException ex)
+            catch (Exception ex)
             {
-                return BadRequest(new { error = ex.Message });
+                return StatusCode(500, new { error = "An error occurred while updating vehicle status", details = ex.Message });
             }
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> DeleteVehicle(int id)
         {
             try
             {
-                await _vehicleService.DeleteVehicleAsync(id);
-                return NoContent();
+                var result = await _vehicleService.DeleteVehicleAsync(id);
+
+                if (!result)
+                    return NotFound(new { error = $"Vehicle with ID {id} not found" });
+
+                return Ok(new { success = true, message = "Vehicle deleted successfully" });
             }
-            catch (KeyNotFoundException ex)
+            catch (ArgumentException ex)
             {
-                return NotFound(new { error = ex.Message });
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "An error occurred while deleting the vehicle", details = ex.Message });
             }
         }
     }

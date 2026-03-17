@@ -6,8 +6,8 @@ namespace DH_VehicleInventory.Infrastructure.Data
     {
         public DH_InventoryDbContext(DbContextOptions<DH_InventoryDbContext> options) : base(options)
         {
-        }
 
+        }
         public DbSet<Vehicle> DH_Vehicles { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

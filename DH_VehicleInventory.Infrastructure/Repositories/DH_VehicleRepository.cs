@@ -1,52 +1,46 @@
-﻿using DH_VehicleInventory.Application.Interfaces;
-using DH_VehicleInventory.Domain.Entities;
+﻿using DH_VehicleInventory.Domain.VehicleAggregate;
+using DH_VehicleInventory.Domain.VehicleAggregate.Entities;
 using DH_VehicleInventory.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
 
 namespace DH_VehicleInventory.Infrastructure.Repositories
 {
-    public class DH_VehicleRepository : DH_IVehicleRepository
+    public class VehicleRepository : IVehicleRepository
     {
         private readonly DH_InventoryDbContext _context;
 
-        public DH_VehicleRepository(DH_InventoryDbContext context)
+        public VehicleRepository(DH_InventoryDbContext context)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+        }
+
+        public Vehicle Add(Vehicle vehicle)
+        {
+            return _context.DH_Vehicles.Add(vehicle).Entity;
+        }
+
+        public void Update(Vehicle vehicle)
+        {
+            _context.DH_Vehicles.Update(vehicle);
+        }
+
+        public void Delete(Vehicle vehicle)
+        {
+            _context.DH_Vehicles.Remove(vehicle);
         }
 
         public async Task<Vehicle> GetByIdAsync(int id)
         {
-            return await _context.DH_Vehicles.FindAsync(id);
+            return await _context.DH_Vehicles
+                .Include(v => v.Inventories)
+                .FirstOrDefaultAsync(v => v.Id == id);
         }
 
         public async Task<IEnumerable<Vehicle>> GetAllAsync()
         {
-            return await _context.DH_Vehicles.ToListAsync();
-        }
-
-        public async Task AddAsync(Vehicle vehicle)
-        {
-            await _context.DH_Vehicles.AddAsync(vehicle);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task UpdateAsync(Vehicle vehicle)
-        {
-            _context.DH_Vehicles.Update(vehicle);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task DeleteAsync(int id)
-        {
-            var vehicle = await _context.DH_Vehicles.FindAsync(id);
-            if (vehicle != null)
-            {
-                _context.DH_Vehicles.Remove(vehicle);
-                await _context.SaveChangesAsync();
-            }
+            return await _context.DH_Vehicles
+                .Include(v => v.Inventories)
+                .ToListAsync();
         }
     }
 }

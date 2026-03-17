@@ -10,24 +10,24 @@ namespace DH_VehicleInventory.Infrastructure.Data.Configurations
         public void Configure(EntityTypeBuilder<Vehicle> builder)
         {
             builder.ToTable("DH_Vehicles");
+
             builder.HasKey(v => v.Id);
 
-            builder.Property(v => v.VehicleCode)
-                .HasMaxLength(20)
-                .IsRequired();
+            builder.Property(v => v.Id)
+                .ValueGeneratedOnAdd();
 
             builder.OwnsOne(v => v.VehicleCode, vc =>
             {
                 vc.Property(c => c.Code)
                     .HasColumnName("VehicleCode")
-                    .HasMaxLength(20);
+                    .HasMaxLength(20)
+                    .IsRequired();
             });
 
             builder.OwnsOne(v => v.VehicleType, vt =>
             {
                 vt.Property(t => t.Id)
                     .HasColumnName("VehicleTypeId");
-
                 vt.Property(t => t.Name)
                     .HasColumnName("VehicleTypeName")
                     .HasMaxLength(50);
@@ -37,7 +37,6 @@ namespace DH_VehicleInventory.Infrastructure.Data.Configurations
             {
                 vs.Property(s => s.Id)
                     .HasColumnName("StatusId");
-
                 vs.Property(s => s.Name)
                     .HasColumnName("StatusName")
                     .HasMaxLength(30);
